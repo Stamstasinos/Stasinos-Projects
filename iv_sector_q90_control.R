@@ -5,9 +5,6 @@ data_q90_2014_2019_ctrl <- data %>%
           eurosceptic_vote_share_2014,
           agri_above_q90, tourists_above_q90, mining_above_q90,
           vehicles_above_q90, cooling_above_q90)
-
-# 2. Run IV regressions (exact same structure as 75th version)
-
 iv_agri_q90_ctrl <- ivreg(
   eurosceptic_vote_share ~ gdp_per_capita +
     agri_above_q90 +
@@ -70,12 +67,8 @@ iv_ghg_q90_ctrl <- ivreg(
     I(ETS_price * ghg_above_q90),
   data = data_q90_2014_2019_ctrl
 )
-
-# 3. Combine models
 models_q90_ctrl <- list(iv_agri_q90_ctrl, iv_tour_q90_ctrl,
                         iv_mine_q90_ctrl, iv_veh_q90_ctrl, iv_cool_q90_ctrl, iv_ghg_q90_ctrl)
-
-# 4. Output with stargazer
 stargazer(models_q90_ctrl,
           type = "text",
           title = "IV Regressions by Sector (90th Percentile)",
