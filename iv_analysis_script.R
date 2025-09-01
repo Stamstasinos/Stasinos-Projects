@@ -5,10 +5,7 @@ library(stargazer)
 library(dplyr)
 library(ggplot2)
 
-# Load the full dataset
 data <- read_excel("HERE_CONTROL.xlsx")
-
-# Convert relevant columns to numeric
 data$gdp_per_capita <- as.numeric(data$gdp_per_capita)
 data$eurosceptic_vote_share <- as.numeric(data$eurosceptic_vote_share)
 data$ETS_price <- as.numeric(data$ETS_price)
@@ -23,8 +20,6 @@ data_2014_2019 <- data %>%
           RO, BG, LT, LV, EE, HR, SI, IE, MT, CY, LU)
 
 data_2014_2019 <- na.omit(data_2014_2019[, c("gdp_per_capita", "ETS_price", "eurosceptic_vote_share")])
-
-# Predicted vote share from IV model
 data_2014_2019$fitted <- fitted(model_)
 data_2014_2019$iv_fitted <- data_2014_2019$fitted
 
@@ -47,8 +42,6 @@ model_fe <- ivreg(
   data = data_2014_2019
 )
 model_fe$call <- quote(ivreg(eurosceptic_vote_share ~ gdp_per_capita + pop_density))
-
-# Export model results to LaTeX
 stargazer(model_fe,
           type = "latex",
           title = "IV Regression: Main Effects with Country Fixed Effects",
@@ -64,16 +57,10 @@ stargazer(model_fe,
 
 data_2014_2019$eurosceptic_hat <- fitted(model_fe)
 data_2014_2019$residuals <- resid(model_fe)
-
-# Extract country code from NUTS2 region
 data_2014_2019$country <- substr(data_2014_2019$group_id, 1, 2)
-
-# Identify top 5 residual outliers
 top_outliers <- data_2014_2019 %>%
   mutate(abs_resid = abs(residuals)) %>%
   top_n(5, abs_resid)
-
-# Plot
 iv_plot <- ggplot(data_2014_2019, aes(x = gdp_per_capita, y = eurosceptic_vote_share, color = country)) +
   geom_point(alpha = 0.6) +
   geom_smooth(method = "lm", se = TRUE, color = "blue", fill = "lightblue", show.legend = FALSE) +
